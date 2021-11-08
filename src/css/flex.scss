@@ -1,0 +1,20 @@
+.flex{
+    display:flex;
+}
+
+.flex-col{
+    flex-direction:column;
+}
+
+.justify-center{
+    // 主轴居中
+    justify-content:center;
+}
+.justify-between{
+    justify-content:space-between;
+}
+
+.align-center{
+    // 交叉轴居中
+    align-items:center;
+}
