@@ -7,6 +7,7 @@
           >ElementUI Demo</router-link
         >
         <router-link class="mx-6" to="/echartsDemo">Echarts Demo</router-link>
+        <router-link class="mx-6" to="/drag">Drag Demo</router-link>
       </div>
     </div>
   </div>

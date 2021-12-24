@@ -2,8 +2,22 @@
   text-align: center;
 }
 
-.h100 {
+.border-box {
+  box-sizing: border-box;
+}
+
+.h-full {
   height: 100%;
+}
+.w-full {
+  width: 100%;
+}
+.full {
+  height: 100%;
+  width: 100%;
+}
+.p-1 {
+  padding: 1rem;
 }
 
 .mt-4 {

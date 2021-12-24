@@ -1,20 +1,22 @@
-.flex{
-    display:flex;
+.flex {
+  display: flex;
 }
 
-.flex-col{
-    flex-direction:column;
+.flex-col {
+  flex-direction: column;
+}
+.flex-1 {
+  flex: 1;
+}
+.justify-center {
+  // 主轴居中
+  justify-content: center;
+}
+.justify-between {
+  justify-content: space-between;
 }
 
-.justify-center{
-    // 主轴居中
-    justify-content:center;
-}
-.justify-between{
-    justify-content:space-between;
-}
-
-.align-center{
-    // 交叉轴居中
-    align-items:center;
+.align-center {
+  // 交叉轴居中
+  align-items: center;
 }
