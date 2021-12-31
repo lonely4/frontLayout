@@ -4,15 +4,14 @@ export default class LinkNode {
     this.parentId = parentId
     this.type = draggingToll.type
     // 上一节点
-    this.next = null
+    this.next = []
     // 下一节点
-    this.prev = null
+    this.prev = []
     // el元素属性
     this.attr = { ...draggingToll.attr, 'data-id': id }
     // el元素事件
     this.event = {
       ...draggingToll.event,
-      click: this.click,
       mousedown: this.mousedown.bind(this),
       mousemove: this.mousemove.bind(this),
       mouseup: this.mouseup.bind(this),
@@ -45,6 +44,27 @@ export default class LinkNode {
     }
     return this
   }
+  getPosition() {
+    if (this.type === 'rect') {
+      return [this.attr.x, this.attr.y]
+    }
+    return [this.attr.cx, this.attr.cy]
+  }
+  getCentrePosition() {
+    if (this.type === 'rect') {
+      return [
+        this.attr.x + this.attr.width / 2,
+        this.attr.y + this.attr.height / 2
+      ]
+    }
+    return [this.attr.cx, this.attr.cy]
+  }
+  getSize() {
+    if (this.type === 'rect') {
+      return [this.attr.width, this.attr.height]
+    }
+    return [this.attr.r * 2, this.attr.r * 2]
+  }
   isStart() {
     this.prev = 'start'
     return this
@@ -54,12 +74,28 @@ export default class LinkNode {
     return this
   }
   setNext(val) {
-    this.next = val
-    return this
+    if (!this.next.includes(val)) {
+      this.next.push(val)
+      return this
+    }
   }
   setPrev(val) {
-    this.prev = val
-    return this
+    if (!this.prev.includes(val)) {
+      this.prev.push(val)
+      return this
+    }
+  }
+  deleteNext(id) {
+    let idx = this.next.indexOf(id)
+    if (idx > -1) {
+      this.next.splice(idx, 1)
+    }
+  }
+  deletePrev(id) {
+    let idx = this.prev.indexOf(id)
+    if (idx > -1) {
+      this.prev.splice(idx, 1)
+    }
   }
   setAttr(key, val) {
     this.attr[key] = val
@@ -69,42 +105,29 @@ export default class LinkNode {
     this.workFlowConfig[key] = val
     return this
   }
-  click() {
-    console.log('isClick')
-  }
+  click() {}
   mousedown(ev) {
-    console.log('mousedown')
-    this.dragging = true
-    this.setDeviationData(ev)
+    if (ev.button === 0) {
+      this.dragging = true
+      this.setDeviationData(ev)
+    }
   }
   mousemove(ev) {
-    console.log('mousemove')
     this.move(ev)
   }
   mouseup() {
-    console.log('mouseup')
     this.dragging = false
   }
   mouseout(ev) {
     this.move(ev)
-    // this.dragging = false
   }
   mouseover(ev) {
     this.move(ev)
   }
   setDeviationData(ev) {
-    switch (this.type) {
-      case 'rect':
-        this.deviationX = ev.clientX - this.attr.x
-        this.deviationY = ev.clientY - this.attr.y
-        break
-      case 'circle':
-        this.deviationX = ev.clientX - this.attr.cx
-        this.deviationY = ev.clientY - this.attr.cy
-        break
-      default:
-        break
-    }
+    const p = this.getPosition()
+    this.deviationX = ev.clientX - p[0]
+    this.deviationY = ev.clientY - p[1]
   }
   move(ev) {
     if (!this.dragging) return
