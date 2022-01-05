@@ -1,91 +1,95 @@
 <template>
-  <div class="main flex border-box p-1 full" ref="div">
-    <div class="tools flex flex-col h-full" ref="tools">
-      <ul class="full border-box">
-        <li
-          v-for="tool of tools"
-          :key="tool.name"
-          :draggable="tool.draggable"
-          @dragstart="toolDragstart($event, tool)"
-          v-on="{ ...tool.event }"
-          :class="{ toolSelected: tool.name === 'transition' && lineing }"
-        >
-          {{ tool.name }}
-        </li>
-      </ul>
-    </div>
-    <div class="dragArea flex-1">
-      <svg
-        class="full"
-        ref="svg"
-        @drop="svgDrag"
-        @dragover="svgDragover"
-        @mousemove="svgMousemove"
-        @click="svgClick"
-        @contextmenu.prevent="svgRClick"
-      >
-        <template v-for="linkNode of linkNodes">
-          <rect
-            v-if="linkNode.type === 'rect'"
-            :key="linkNode.id"
-            v-bind="{ ...linkNode.attr }"
-            v-on="{ ...linkNode.event }"
-            :class="{
-              'cursor-move': linkNode.dragging
-            }"
-          />
-          <circle
-            v-if="linkNode.type === 'circle'"
-            :key="linkNode.id"
-            v-bind="{ ...linkNode.attr }"
-            v-on="{ ...linkNode.event }"
-            :class="{
-              'cursor-move': linkNode.dragging
-            }"
-          />
-          <text
-            :key="linkNode.id + 'text'"
-            :x="
-              linkNode.type === 'rect'
-                ? linkNode.attr.x + linkNode.attr.width / 2
-                : linkNode.attr.cx
-            "
-            :y="
-              linkNode.type === 'rect'
-                ? linkNode.attr.y + linkNode.attr.height / 2 + 5
-                : linkNode.attr.cy + 5
-            "
-            :data-id="linkNode.id"
-            font-size="16px"
-            fill="black"
-            text-anchor="middle"
-            :class="{ textUnselect: linkNode.dragging }"
+  <div class="full">
+    <div class="main flex border-box p-1 full" ref="div">
+      <div class="tools flex flex-col h-full" ref="tools">
+        <ul class="full border-box">
+          <li
+            v-for="tool of tools"
+            :key="tool.name"
+            :draggable="tool.draggable"
+            @dragstart="toolDragstart($event, tool)"
+            v-on="{ ...tool.event }"
+            :class="{ toolSelected: tool.name === 'transition' && lineing }"
           >
-            {{ linkNode.workFlowConfig.name }}
-          </text>
-        </template>
-        <template v-for="line of lines">
-          <line
-            :key="line.lineId"
-            v-bind="{ ...line }"
-            stroke="black"
-            style="stroke-width:2px;"
-          />
-          <path
-            :key="line.lineId + 'arrow'"
-            :d="line.d"
-            fill="black"
-            stroke="black"
-          />
-        </template>
-      </svg>
+            {{ tool.name }}
+          </li>
+        </ul>
+      </div>
+      <div class="dragArea flex-1">
+        <svg
+          class="full"
+          ref="svg"
+          @drop="svgDrag"
+          @dragover="svgDragover"
+          @mousemove="svgMousemove"
+          @click="svgClick"
+          @contextmenu.prevent="svgRClick"
+        >
+          <template v-for="linkNode of linkNodes">
+            <rect
+              v-if="linkNode.type === 'rect'"
+              :key="linkNode.id"
+              v-bind="{ ...linkNode.attr }"
+              v-on="{ ...linkNode.event }"
+              :class="{
+                'cursor-move': linkNode.dragging
+              }"
+            />
+            <circle
+              v-if="linkNode.type === 'circle'"
+              :key="linkNode.id"
+              v-bind="{ ...linkNode.attr }"
+              v-on="{ ...linkNode.event }"
+              :class="{
+                'cursor-move': linkNode.dragging
+              }"
+            />
+            <text
+              :key="linkNode.id + 'text'"
+              :x="
+                linkNode.type === 'rect'
+                  ? linkNode.attr.x + linkNode.attr.width / 2
+                  : linkNode.attr.cx
+              "
+              :y="
+                linkNode.type === 'rect'
+                  ? linkNode.attr.y + linkNode.attr.height / 2 + 5
+                  : linkNode.attr.cy + 5
+              "
+              :data-id="linkNode.id"
+              font-size="16px"
+              fill="black"
+              text-anchor="middle"
+              :class="{ textUnselect: linkNode.dragging }"
+            >
+              {{ linkNode.workFlowConfig.name }}
+            </text>
+          </template>
+          <template v-for="line of lines">
+            <line
+              :key="line.lineId"
+              v-bind="{ ...line }"
+              stroke="black"
+              style="stroke-width:2px;"
+            />
+            <path
+              :key="line.lineId + 'arrow'"
+              :d="line.d"
+              fill="black"
+              stroke="black"
+            />
+          </template>
+        </svg>
+      </div>
     </div>
+    <attr-form ref="attrForm" v-model="attrFormData"></attr-form>
   </div>
 </template>
 
 <script>
 import getRandomId from './js/util'
 import LinkNode from './js/linkNode'
+import AttrForm from './components/attr-form.vue'
 const interval = 5
 function computeLinePosition(x, y, w, h, k, b, isLeft) {
   // 此处的w及h均为对应宽高的一半
@@ -135,8 +139,12 @@ function getArrowDAttr(x1, y1, x2, y2, k) {
   return `M${x1} ${y1} L ${xa} ${ya} L ${xb} ${yb} Z`
 }
 export default {
+  components: {
+    AttrForm
+  },
   created() {
     this.workFlowNode.id = getRandomId()
+    this.attrFormData = this.workFlowNode
     window.addEventListener('keydown', ev => {
       console.log(this.clickLineId)
       if (ev.key === 'Delete' && this.clickLineId) {
@@ -148,7 +156,7 @@ export default {
   },
   data() {
     return {
-      workFlowNode: { name: '新流程', id: '' },
+      workFlowNode: { id: '', name: '新流程' },
       linkNodes: {},
       tools: [
         {
@@ -213,7 +221,8 @@ export default {
       draggingTool: null,
       lineing: false,
       lineFromNodeId: null,
-      clickLineId: null
+      clickLineId: null,
+      attrFormData: null
     }
   },
   methods: {
@@ -241,11 +250,13 @@ export default {
       this.clickLineId = null
       if (el.nodeName === 'svg') {
         this.lineing = false
+        this.attrFormData = this.workFlowNode
       }
       if (['rect', 'circle'].includes(el.nodeName)) {
         const id = el.dataset.id,
           linkNode = this.linkNodes[id]
         linkNode.click(ev)
+        this.attrFormData = linkNode.workFlowConfig
         // 划线
         if (this.lineing) {
           if (this.lineFromNodeId) {
@@ -260,9 +271,7 @@ export default {
           }
         }
       }
-      console.log('ev.target.dataset.lineId', ev.target.dataset.lineId)
       if (el.nodeName === 'line') {
-        console.log('ev.target.dataset.lineId', ev.target.dataset)
         this.clickLineId = ev.target.dataset.lineId
       }
     },

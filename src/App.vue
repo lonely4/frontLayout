@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <back-home></back-home>
+    <!-- <back-home></back-home> -->
     <router-view />
   </div>
 </template>
 
 <script>
-import backHome from "./components/common/backHome.vue";
+// import backHome from './components/common/backHome.vue'
 export default {
   components: {
-    backHome,
-  },
-};
+    // backHome
+  }
+}
 </script>
 
 <style lang="scss" scoped>
